@@ -1,0 +1,153 @@
+import random
+import os
+import time
+
+
+# declaracao de funcoes
+
+def cls():
+    os.system('cls' if os.name == 'nt' else 'clear')
+
+
+def matrix(n_linhas, n_colunas, char):
+    matrix = []
+    linha = []
+
+    while len(matrix) != n_linhas:
+        linha.append(char)
+
+        if len(linha) == n_colunas:
+            matrix.append(linha)
+            linha = []
+
+    return matrix
+
+
+def print_matrix(m):
+    for i in range(len(m)):
+        print(m[i])
+
+
+# inicio do programa
+
+player_map = matrix(5, 10, 0)
+cpu_map = matrix(5, 10, 0)
+
+player_feedback = matrix(5, 10, 'A')
+cpu_feedback = matrix(5, 10, 'A')
+
+player_ships = 0
+player_shipcount = 1
+cpu_ships = 0
+
+# settando configs do jogo
+
+max_ships = int(input("Digite quantas embarcacoes cada jogador tera: "))
+
+while player_ships != max_ships:
+    print("digite as coordenadas da sua ", end=" ")
+    print(player_shipcount, end=" ")
+    print("a embarcacao")
+    linha = int(input("linha: "))
+    coluna = int(input("coluna: "))
+
+    if linha < 5 and coluna < 10:
+        if player_map[linha][coluna] == 1:
+            print("coordenada ja selecionada, escolha novamente")
+        else:
+            player_map[linha][coluna] = 1
+
+            player_ships += 1
+            player_shipcount += 1
+
+    else:
+        print("Coordenadas invalidas, digite um valor de 0 a 4 para linhas e de 0 a 9 para colunas")
+
+while cpu_ships != max_ships:
+    linha = random.randint(0, 4)
+    coluna = random.randint(0, 9)
+
+    if cpu_map[linha][coluna] != 1:
+        cpu_map[linha][coluna] = 1
+        cpu_feedback[linha][coluna] = 'P'  # debug
+
+        cpu_ships += 1
+
+# loop do jogo
+rodando = 1  # flag de execucao do jogo
+while rodando == 1:
+
+    cls()
+
+    print("Tabuleiro do Computador")
+    print_matrix(cpu_feedback)
+    print("Embarcacoes Restantes: ", end=" "), print(cpu_ships)
+
+    print('\n\n')
+
+    print("Tabuleiro do Jogador")
+    print_matrix(player_feedback)
+    print("Embarcacoes Restantes: ", end=" "), print(player_ships)
+
+    print('\n\n')
+
+    print("Turno do Jogador: ")
+    print("Digite as coordenadas do disparo: ")
+
+    linha = int(input("linha: "))
+    coluna = int(input("coluna: "))
+
+    if linha < 5 and coluna < 10:
+        if cpu_map[linha][coluna] == 1:
+            print("embarcacao atingida!")
+            cpu_map[linha][coluna] = 2
+            cpu_feedback[linha][coluna] = 'X'
+            cpu_ships -= 1
+
+        elif cpu_map[linha][coluna] == 0:
+            print("ERROU!")
+            cpu_map[linha][coluna] = 2
+            cpu_feedback[linha][coluna] = 'O'
+
+        else:
+            print("Coordenadas ja utilizadas anteriormente, rodada perdida")
+
+    else:
+        print("Coordenadas invalidas, digite um valor de 0 a 4 para linhas e de 0 a 9 para colunas")
+
+    # fim do turno do jogador
+
+    print('\n\n')
+
+    print("Turno do Computador: ")
+    linha = random.randint(0, 4)
+    coluna = random.randint(0, 9)
+
+    if player_map[linha][coluna] == 1:
+        print("embarcacao atingida!")
+        player_map[linha][coluna] = 2
+        player_feedback[linha][coluna] = 'X'
+        player_ships -= 1
+
+    elif player_map[linha][coluna] == 0:
+        print("ERROU!")
+        player_map[linha][coluna] = 2
+        player_feedback[linha][coluna] = 'O'
+
+    else:
+        print("Coordenadas ja utilizadas anteriormente, rodada perdida")
+
+    time.sleep(1)
+    # condicoes de fim de jogo
+    if cpu_ships == 0:
+        rodando = 0
+    if player_ships == 0:
+        rodando = 0
+    # fim do turno do computador
+
+# mostra tela de fim de jogo
+cls()
+if player_ships == 0:
+    print("Voce Perdeu!")
+elif cpu_ships == 0:
+    print("Voce Venceu!")
